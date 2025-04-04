@@ -98,17 +98,17 @@ class AsyncRedisSaver(BaseRedisSaver[AsyncRedis, AsyncSearchIndex]):
         self.checkpoints_index = AsyncSearchIndex.from_dict(
             self.SCHEMAS[0]
         )
-        self.checkpoints_index.set_client(self._redis)
+
 
         self.checkpoint_blobs_index = AsyncSearchIndex.from_dict(
             self.SCHEMAS[1]
         )
-        self.checkpoint_blobs_index.set_client(self._redis)
+
 
         self.checkpoint_writes_index = AsyncSearchIndex.from_dict(
             self.SCHEMAS[2]
         )
-        self.checkpoint_writes_index.set_client(self._redis)
+
 
 
     async def __aenter__(self) -> AsyncRedisSaver:
@@ -136,8 +136,13 @@ class AsyncRedisSaver(BaseRedisSaver[AsyncRedis, AsyncSearchIndex]):
     async def asetup(self) -> None:
         """Initialize Redis indexes asynchronously."""
         # Create indexes in Redis asynchronously
+        await self.checkpoints_index.set_client(self._redis)
         await self.checkpoints_index.create(overwrite=False)
+
+        await self.checkpoint_blobs_index.set_client(self._redis)
         await self.checkpoint_blobs_index.create(overwrite=False)
+
+        await self.checkpoint_writes_index.set_client(self._redis)
         await self.checkpoint_writes_index.create(overwrite=False)
 
     async def aget_tuple(self, config: RunnableConfig) -> Optional[CheckpointTuple]:
