@@ -96,14 +96,20 @@ class AsyncRedisSaver(BaseRedisSaver[AsyncRedis, AsyncSearchIndex]):
     def create_indexes(self) -> None:
         """Create indexes without connecting to Redis."""
         self.checkpoints_index = AsyncSearchIndex.from_dict(
-            self.SCHEMAS[0], redis_client=self._redis
+            self.SCHEMAS[0]
         )
+        self.checkpoints_index.set_client(self._redis)
+
         self.checkpoint_blobs_index = AsyncSearchIndex.from_dict(
-            self.SCHEMAS[1], redis_client=self._redis
+            self.SCHEMAS[1]
         )
+        self.checkpoint_blobs_index.set_client(self._redis)
+
         self.checkpoint_writes_index = AsyncSearchIndex.from_dict(
-            self.SCHEMAS[2], redis_client=self._redis
+            self.SCHEMAS[2]
         )
+        self.checkpoint_writes_index.set_client(self._redis)
+
 
     async def __aenter__(self) -> AsyncRedisSaver:
         """Async context manager enter."""
